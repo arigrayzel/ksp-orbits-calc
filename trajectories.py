@@ -12,7 +12,7 @@ def hohmann_transfer(origin, dest, r_p):
     try:
         origin = bodies[origin]
         dest = bodies[dest]
-        r_p = float(r_p)*3 + origin['r'] #parking orbit ought to be passed as km
+        r_p = float(r_p)*1000 + origin['r'] #parking orbit ought to be passed as km
     except:
         print("Unrecognized planet name(s). Format should be: \"trajectories hohmann <origin> <destination> <parking orbit> (km)\"")
         return
@@ -36,7 +36,18 @@ def hohmann_transfer(origin, dest, r_p):
     delta_theta_launch = delta_theta_transfer - delta_theta_d
     print("To perform a Hohmann transfer from {} to {}, burn when the planets have a relative angle of {:.2f} degrees".format(origin["name"], dest["name"], delta_theta_launch))
 
+############################## Delta-V calculations
 
+    v_park = np.sqrt(origin['mu']/r_p)
+    if sign==1:
+        v_inf = np.sqrt(mu/origin['a'])*(1-np.sqrt(2*dest['a']/(origin['a']+dest['a'])))
+    else:
+        v_inf = np.sqrt(mu/origin['a'])*(np.sqrt(2*dest['a']/(dest['a']+origin['a']))-1)
+    v_H = np.sqrt(v_inf**2 + 2*origin['mu']/r_p)
+    delta_v_burn = v_H-v_park
+    print("V_inf:{}".format(v_H))
+    print("Other term:{}".format(v_park))
+    print("To transfer intercept {}, apply a Delta-v of {:.2f} m/s".format(dest["name"], delta_v_burn))
 if __name__ == "__main__":
 
     hohmann_names = ['h', 'hohmann', 'Hohmann']
